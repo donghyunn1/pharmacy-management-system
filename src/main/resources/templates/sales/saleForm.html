@@ -1,0 +1,280 @@
+<!DOCTYPE html> <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout1}"> <!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css"> <style> .fieldError { color:
+        #bd2130; } .form-section { margin-bottom: 30px; } .medicine-item { background-color:
+        #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px; position: relative; } .remove-item { position: absolute; top: 5px; right: 5px; cursor: pointer; color:
+        #dc3545; } .prescription-warning { color:
+        #dc3545; font-weight: bold; } #totalPrice { font-size: 1.2em; font-weight: bold; } </style> </th:block>
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script"> <script th:inline="javascript"> $(document).ready(function() { var errorMessage = [[${errorMessage}]]; if (errorMessage != null) { alert(errorMessage); }
+
+  // 약품 관련 정보 저장
+  var medicineData = {};
+
+  // 초기화
+  [[${medicines}]].forEach(function(medicine) {
+    medicineData[medicine.id] = {
+      name: medicine.medicineName,
+      type: medicine.medicineType,
+      price: 0, // 가격은 재고 선택 시 설정
+      isPrescriptionRequired: medicine.prescriptionRequired
+    };
+  });
+
+  // 판매 항목 추가
+  $("#addItemBtn").click(function() {
+    addSaleItem();
+  });
+
+  // 판매 항목 제거
+  $(document).on("click", ".remove-item", function() {
+    $(this).closest(".medicine-item").remove();
+    updateTotalPrice();
+  });
+
+  // 약품 선택 시 이벤트
+  $(document).on("change", ".medicine-select", function() {
+    var itemContainer = $(this).closest(".medicine-item");
+    var medicineId = $(this).val();
+    var isPrescriptionRequired = medicineData[medicineId] && medicineData[medicineId].isPrescriptionRequired;
+
+    // 처방전 필요 약품인 경우 처방전 정보 필수
+    if (isPrescriptionRequired) {
+      itemContainer.find(".prescription-info").show();
+      itemContainer.find(".prescription-warning").show();
+    } else {
+      itemContainer.find(".prescription-info").hide();
+      itemContainer.find(".prescription-warning").hide();
+    }
+
+    updateTotalPrice();
+  });
+
+  // 수량 변경 시 이벤트
+  $(document).on("change", ".quantity-input", function() {
+    updateTotalPrice();
+  });
+
+  // 처방전 관련 정보 토글
+  $("#prescriptionCheck").change(function() {
+    if ($(this).prop("checked")) {
+      $("#prescriptionSection").show();
+    } else {
+      $("#prescriptionSection").hide();
+      // 처방전 정보 초기화
+      $("#prescriptionId").val("");
+      $(".prescription-info").hide();
+
+      // 처방전 필요 약품 제거
+      $(".medicine-item").each(function() {
+        var medicineSelect = $(this).find(".medicine-select");
+        var medicineId = medicineSelect.val();
+        if (medicineData[medicineId] && medicineData[medicineId].isPrescriptionRequired) {
+          $(this).remove();
+        }
+      });
+    }
+    updateTotalPrice();
+  });
+
+  // 판매 항목 추가 함수
+  function addSaleItem() {
+    var itemCount = $(".medicine-item").length;
+    var itemHtml = `
+            <div class="medicine-item">
+                <span class="remove-item">&times;</span>
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label>약품 <span class="text-danger">*</span></label>
+                            <select name="saleItems[${itemCount}].medicineId" class="form-control medicine-select" required>
+                                <option value="">-- 약품 선택 --</option>
+                                ${generateMedicineOptions()}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>수량 <span class="text-danger">*</span></label>
+                            <input type="number" name="saleItems[${itemCount}].quantity" class="form-control quantity-input" min="1" value="1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4 prescription-info" style="display:none;">
+                        <div class="form-group">
+                            <label>처방전 항목 ID <span class="text-danger">*</span></label>
+                            <input type="text" name="saleItems[${itemCount}].prescriptionItemId" class="form-control prescription-item-id">
+                        </div>
+                        <div class="prescription-warning">처방전이 필요한 약품입니다!</div>
+                    </div>
+                </div>
+            </div>
+            `;
+
+    $("#saleItemsContainer").append(itemHtml);
+  }
+
+  // 약품 옵션 생성 함수
+  function generateMedicineOptions() {
+    var options = "";
+    [[${medicines}]].forEach(function(medicine) {
+      options += `<option value="${medicine.id}">${medicine.medicineName} (${medicine.medicineType})</option>`;
+    });
+    return options;
+  }
+
+  // 총액 계산 함수
+  function updateTotalPrice() {
+    var total = 0;
+    $(".medicine-item").each(function() {
+      var medicineId = $(this).find(".medicine-select").val();
+      var quantity = parseInt($(this).find(".quantity-input").val()) || 0;
+
+      // 가격 정보는 서버에서 계산되므로 여기서는 임시 값으로 설정
+      var estimatedPrice = 1000; // 실제 가격은 서버에서 계산됨
+      total += estimatedPrice * quantity;
+    });
+
+    $("#totalPrice").text(formatNumber(total) + " 원 (예상)");
+  }
+
+  // 숫자 포맷 함수
+  function formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // 폼 제출 전 유효성 검사
+  $("#saleForm").submit(function(event) {
+    // 판매 항목이 없는 경우
+    if ($(".medicine-item").length === 0) {
+      alert("최소 하나 이상의 판매 항목을 추가해주세요.");
+      event.preventDefault();
+      return false;
+    }
+
+    // 처방전 필요 약품 체크
+    var hasPrescriptionRequiredItem = false;
+    var isPrescriptionProvided = $("#prescriptionCheck").prop("checked") && $("#prescriptionId").val().trim() !== "";
+
+    $(".medicine-item").each(function() {
+      var medicineSelect = $(this).find(".medicine-select");
+      var medicineId = medicineSelect.val();
+
+      // 약품 선택 확인
+      if (!medicineId) {
+        alert("모든 항목에 약품을 선택해주세요.");
+        event.preventDefault();
+        return false;
+      }
+
+      // 처방전 필요 약품 확인
+      if (medicineData[medicineId] && medicineData[medicineId].isPrescriptionRequired) {
+        hasPrescriptionRequiredItem = true;
+        var prescriptionItemId = $(this).find(".prescription-item-id").val().trim();
+
+        if (!isPrescriptionProvided || prescriptionItemId === "") {
+          alert("처방전이 필요한 약품은 처방전 정보를 입력해야 합니다.");
+          event.preventDefault();
+          return false;
+        }
+      }
+    });
+
+    // 처방전 필요 약품이 있는데 처방전 정보가 없는 경우
+    if (hasPrescriptionRequiredItem && !isPrescriptionProvided) {
+      alert("처방전이 필요한 약품이 포함되어 있습니다. 처방전 정보를 입력해주세요.");
+      event.preventDefault();
+      return false;
+    }
+
+    return true;
+  });
+
+  // 초기 항목 추가
+  addSaleItem();
+});
+</script>
+</th:block>
+
+<div layout:fragment="content"> <div class="container"> <h2 class="mb-4">판매 등록</h2>
+  <!-- 에러 메시지 표시 -->
+  <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+    <span th:text="${errorMessage}"></span>
+  </div>
+
+  <form id="saleForm" th:action="@{/sales/new}" method="post" th:object="${saleFormDto}">
+    <!-- 고객 및 처방전 정보 -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">판매 기본 정보</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="customerId">고객 ID (선택사항)</label>
+              <input type="text" th:field="*{customerId}" class="form-control" id="customerId" placeholder="고객 ID 입력">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="paymentMethod">결제 방법 <span class="text-danger">*</span></label>
+              <select th:field="*{paymentMethod}" class="form-control" id="paymentMethod" required>
+                <option value="">-- 결제 방법 선택 --</option>
+                <option th:each="method : ${paymentMethods}"
+                        th:value="${method}"
+                        th:text="${method.displayName}"></option>
+              </select>
+              <p th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}" class="fieldError">Incorrect data</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="prescriptionCheck">
+          <label class="form-check-label" for="prescriptionCheck">처방전이 있습니다</label>
+        </div>
+
+        <div id="prescriptionSection" style="display:none;">
+          <div class="form-group">
+            <label for="prescriptionId">처방전 ID</label>
+            <input type="text" th:field="*{prescriptionId}" class="form-control" id="prescriptionId" placeholder="처방전 ID 입력">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 판매 항목 -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">판매 항목</h5>
+      </div>
+      <div class="card-body">
+        <div id="saleItemsContainer">
+          <!-- JavaScript로 동적 추가 -->
+        </div>
+
+        <button type="button" id="addItemBtn" class="btn btn-secondary">
+          <i class="fas fa-plus"></i> 항목 추가
+        </button>
+
+        <div class="text-right mt-3">
+          <h4>총액: <span id="totalPrice">0 원 (예상)</span></h4>
+          <p class="text-muted small">* 최종 가격은 각 약품의 실제 재고 상황에 따라 결정됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 제출 버튼 -->
+    <div class="form-group text-center">
+      <button type="submit" class="btn btn-primary mr-2">
+        <i class="fas fa-save"></i> 판매 완료
+      </button>
+      <a th:href="@{/sales}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> 취소
+      </a>
+    </div>
+
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+  </form>
+</div>
+</div> </html>

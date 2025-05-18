@@ -79,10 +79,10 @@ public class InventoryController {
 
             // 일단 서비스에 getInventoryFormDto 메소드가 없으므로 에러 메시지 표시
             model.addAttribute("errorMessage", "현재 입고 수정 기능은 구현되지 않았습니다.");
-            return "error/404";
+            return "error";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "error/404";
+            return "error";
         }
     }
 
@@ -141,7 +141,7 @@ public class InventoryController {
             return "inventory/medicineInventory";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "error/404";
+            return "error";
         }
     }
 }

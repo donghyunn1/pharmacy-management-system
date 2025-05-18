@@ -1,69 +1,52 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!DOCTYPE html> <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <div th:fragment="header"> <nav class="navbar navbar-expand-sm bg-primary navbar-dark"> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <a class="navbar-brand" href="/">약국 관리 시스템</a>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <!-- 관리자용 메뉴 -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                <a class="nav-link" href="/admin/medicines/new">약품 등록</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                <a class="nav-link" href="/admin/medicines">약품 관리</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                <a class="nav-link" href="/admin/inventory">재고 관리</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')">
+                <a class="nav-link" href="/sales">판매 관리</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')">
+                <a class="nav-link" href="/sales/new">판매 등록</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                <a class="nav-link" href="/admin/prescriptions">처방전 관리</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                <a class="nav-link" href="/admin/customers">고객 관리</a>
+            </li>
 
-<div th:fragment="header">
-    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="/">약국 관리 시스템</a>
+            <!-- 일반 사용자용 메뉴 -->
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                <a class="nav-link" href="/medicines">약품 목록</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
+                <a class="nav-link" href="/prescriptions/my">나의 처방전</a>
+            </li>
 
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <!-- 관리자용 메뉴 -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/medicines/new">약품 등록</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/medicines">약품 관리</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/inventory">재고 관리</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/sales">판매 내역</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/prescriptions">처방전 관리</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                    <a class="nav-link" href="/admin/customers">고객 관리</a>
-                </li>
-
-                <!-- 일반 사용자용 메뉴 -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
-                    <a class="nav-link" href="/medicines">약품 목록</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
-                    <a class="nav-link" href="/cart">장바구니</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
-                    <a class="nav-link" href="/orders">구매 내역</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_USER')">
-                    <a class="nav-link" href="/prescriptions/my">나의 처방전</a>
-                </li>
-
-                <!-- 로그인/로그아웃, 회원가입 -->
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link" href="/members/login">로그인</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link" href="/members/new">회원가입</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" href="/members/logout">로그아웃</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0" th:action="@{/}" method="get">
-                <input name="searchQuery" class="form-control mr-sm-2" type="search" placeholder="약품 검색" aria-label="Search">
-                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">검색</button>
-            </form>
-        </div>
-    </nav>
-</div>
-
-</html>
+            <!-- 로그인/로그아웃, 회원가입 -->
+            <li class="nav-item" sec:authorize="isAnonymous()">
+                <a class="nav-link" href="/members/login">로그인</a>
+            </li>
+            <li class="nav-item" sec:authorize="isAnonymous()">
+                <a class="nav-link" href="/members/new">회원가입</a>
+            </li>
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a class="nav-link" href="/members/logout">로그아웃</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" th:action="@{/}" method="get">
+            <input name="searchQuery" class="form-control mr-sm-2" type="search" placeholder="약품 검색" aria-label="Search">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">검색</button>
+        </form>
+    </div>
+</nav>
+</div> </html>

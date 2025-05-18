@@ -1,0 +1,91 @@
+<!DOCTYPE html> <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout1}"> <!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css"> <style> .cancelled { text-decoration: line-through; color:
+        #6c757d; } .status-badge-completed { background-color:
+        #28a745; color: white; } .status-badge-cancelled { background-color:
+        #dc3545; color: white; } </style> </th:block>
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script"> <script th:inline="javascript"> $(document).ready(function() { var successMessage = [[${successMessage}]]; if (successMessage != null) { alert(successMessage); } }); </script> </th:block>
+
+<div layout:fragment="content"> <div class="container"> <h2 class="mb-4">판매 내역</h2>
+    <!-- 성공 메시지 표시 -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <span th:text="${successMessage}"></span>
+    </div>
+
+    <!-- 판매 등록 버튼 -->
+    <div class="mb-3 text-right">
+        <a th:href="@{/sales/new}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 판매 등록
+        </a>
+    </div>
+
+    <!-- 판매 목록 테이블 -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th>번호</th>
+                <th>판매일시</th>
+                <th>고객</th>
+                <th>담당자</th>
+                <th>결제방법</th>
+                <th>총액</th>
+                <th>상태</th>
+                <th>상세</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="sale : ${sales}" th:class="${sale.status.name() == 'CANCELLED' ? 'cancelled' : ''}">
+                <td th:text="${sale.id}"></td>
+                <td th:text="${#temporals.format(sale.saleDate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${sale.customerName != null ? sale.customerName : '비회원'}"></td>
+                <td th:text="${sale.memberName}"></td>
+                <td th:text="${sale.paymentMethodDisplay}"></td>
+                <td th:text="${#numbers.formatDecimal(sale.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' 원'"></td>
+                <td>
+                    <span th:if="${sale.status.name() == 'COMPLETED'}" class="badge status-badge-completed">
+                        완료
+                    </span>
+                    <span th:if="${sale.status.name() == 'CANCELLED'}" class="badge status-badge-cancelled">
+                        취소
+                    </span>
+                </td>
+                <td>
+                    <a th:href="@{'/sales/' + ${sale.id}}" class="btn btn-sm btn-info">상세</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(sales)}">
+                <td colspan="8" class="text-center">판매 내역이 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 판매 관리 설명 -->
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">판매 관리 안내</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>판매 상태 설명:</h6>
+                    <ul>
+                        <li><span class="badge status-badge-completed">완료</span> - 판매가 정상적으로 완료된 상태</li>
+                        <li><span class="badge status-badge-cancelled">취소</span> - 판매가 취소된 상태 (재고 복원됨)</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>판매 원칙:</h6>
+                    <ul>
+                        <li><strong>선입선출(FIFO):</strong> 가장 먼저 입고된 약품이 먼저 판매됩니다.</li>
+                        <li><strong>처방전 필요 약품:</strong> 처방전 필요 약품은 반드시 유효한 처방전과 함께 판매해야 합니다.</li>
+                        <li><strong>판매 취소:</strong> 판매 취소 시 해당 약품의 재고가 자동으로 복원됩니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div> </html>

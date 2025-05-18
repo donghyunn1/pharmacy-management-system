@@ -84,7 +84,7 @@ public class MedicineController {
             return "medicine/medicineDetail";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "error/404";
+            return "error";
         }
     }
 
@@ -98,7 +98,7 @@ public class MedicineController {
             return "medicine/medicineForm";
         } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "error/404";
+            return "error";
         }
     }
 
