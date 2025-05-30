@@ -184,6 +184,17 @@ public class SaleService {
     }
 
     /**
+     * 특정 고객의 판매 내역 조회
+     */
+    @Transactional(readOnly = true)
+    public List<SaleDto> getSalesByCustomerId(Long customerId) {
+        List<Sale> sales = saleRepository.findByCustomerIdOrderBySaleDateDesc(customerId);
+        return sales.stream()
+                .map(this::convertToSaleDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Entity -> DTO 변환
      */
     private SaleDto convertToSaleDto(Sale sale) {
