@@ -1,7 +1,10 @@
+// 수정된 SaleController.java
 package com.example.pharmacy.sales.controller;
 
 import com.example.pharmacy.medicine.dto.MedicineDto;
 import com.example.pharmacy.medicine.service.MedicineService;
+import com.example.pharmacy.prescription.dto.PrescriptionDto;
+import com.example.pharmacy.prescription.service.PrescriptionService;
 import com.example.pharmacy.sales.dto.SaleDto;
 import com.example.pharmacy.sales.dto.SaleFormDto;
 import com.example.pharmacy.sales.entity.PaymentMethod;
@@ -24,6 +27,7 @@ public class SaleController {
 
     private final SaleService saleService;
     private final MedicineService medicineService;
+    private final PrescriptionService prescriptionService;
 
     /**
      * 판매 목록 페이지
@@ -56,9 +60,13 @@ public class SaleController {
     @GetMapping("/new")
     public String newSaleForm(Model model) {
         List<MedicineDto> medicines = medicineService.getAllMedicines();
+        List<PrescriptionDto> validPrescriptions = prescriptionService.getValidPrescriptions();
+
         model.addAttribute("saleFormDto", new SaleFormDto());
         model.addAttribute("medicines", medicines);
         model.addAttribute("paymentMethods", PaymentMethod.values());
+        model.addAttribute("validPrescriptions", validPrescriptions);
+
         return "sales/saleForm";
     }
 
@@ -74,8 +82,11 @@ public class SaleController {
         // 유효성 검사 실패 시
         if (bindingResult.hasErrors()) {
             List<MedicineDto> medicines = medicineService.getAllMedicines();
+            List<PrescriptionDto> validPrescriptions = prescriptionService.getValidPrescriptions();
+
             model.addAttribute("medicines", medicines);
             model.addAttribute("paymentMethods", PaymentMethod.values());
+            model.addAttribute("validPrescriptions", validPrescriptions);
             return "sales/saleForm";
         }
 
@@ -90,8 +101,11 @@ public class SaleController {
             return "redirect:/sales/" + sale.getId();
         } catch (Exception e) {
             List<MedicineDto> medicines = medicineService.getAllMedicines();
+            List<PrescriptionDto> validPrescriptions = prescriptionService.getValidPrescriptions();
+
             model.addAttribute("medicines", medicines);
             model.addAttribute("paymentMethods", PaymentMethod.values());
+            model.addAttribute("validPrescriptions", validPrescriptions);
             model.addAttribute("errorMessage", "판매 등록 중 오류가 발생했습니다: " + e.getMessage());
             return "sales/saleForm";
         }
@@ -109,5 +123,25 @@ public class SaleController {
             redirectAttributes.addFlashAttribute("errorMessage", "판매 취소 중 오류가 발생했습니다: " + e.getMessage());
         }
         return "redirect:/sales/" + saleId;
+    }
+
+    /**
+     * AJAX - 유효한 처방전 목록 조회
+     */
+    @GetMapping("/prescriptions/valid")
+    @ResponseBody
+    public List<PrescriptionDto> getValidPrescriptions() {
+        return prescriptionService.getValidPrescriptions();
+    }
+
+    /**
+     * AJAX - 처방전 유효성 검증
+     */
+    @GetMapping("/prescriptions/{prescriptionId}/validate")
+    @ResponseBody
+    public boolean validatePrescriptionForSale(@PathVariable("prescriptionId") Long prescriptionId,
+                                               @RequestParam("medicineId") Long medicineId,
+                                               @RequestParam("quantity") int quantity) {
+        return prescriptionService.validatePrescription(prescriptionId, medicineId, quantity);
     }
 }
