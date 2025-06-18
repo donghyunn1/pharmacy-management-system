@@ -1,4 +1,4 @@
-// 수정된 SaleService.java
+// 양동현. 2025.06.18
 package com.example.pharmacy.sales.service;
 
 import com.example.pharmacy.inventory.entity.MedicineInventory;
@@ -107,16 +107,6 @@ public class SaleService {
             if (!prescriptionService.validatePrescription(sale.getPrescriptionId(), medicine.getId(), itemFormDto.getQuantity())) {
                 throw new IllegalStateException(medicine.getMedicineName() + "의 처방전이 유효하지 않거나 수량이 부족합니다.");
             }
-
-            // 처방전 항목 ID가 필요한 경우 (실제로는 처방전에서 자동으로 찾을 수 있음)
-            if (itemFormDto.getPrescriptionItemId() == null) {
-                // 처방전에서 해당 약품의 항목 ID 찾기
-                var prescriptionItem = prescriptionItemRepository.findByPrescriptionIdAndMedicineId(
-                        sale.getPrescriptionId(), medicine.getId());
-                if (prescriptionItem != null) {
-                    itemFormDto.setPrescriptionItemId(prescriptionItem.getId());
-                }
-            }
         }
 
         // 판매할 총 수량
@@ -208,8 +198,6 @@ public class SaleService {
 
         saleRepository.save(sale);
     }
-
-    // 나머지 메서드들은 기존과 동일...
 
     /**
      * 판매 조회

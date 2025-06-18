@@ -1,8 +1,8 @@
+// 양동현. 2025.06.18
 package com.example.pharmacy.medicine.service;
 
 import com.example.pharmacy.medicine.dto.MedicineDto;
 import com.example.pharmacy.medicine.dto.MedicineFormDto;
-import com.example.pharmacy.medicine.dto.MedicineSearchDto;
 import com.example.pharmacy.medicine.entity.Medicine;
 import com.example.pharmacy.medicine.repository.MedicineRepository;
 import jakarta.persistence.EntityNotFoundException;

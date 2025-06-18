@@ -1,3 +1,4 @@
+// 양동현. 2025.06.18
 package com.example.pharmacy.customer.service;
 
 import com.example.pharmacy.customer.dto.CustomerDto;
@@ -139,61 +140,6 @@ public class CustomerService {
         return customers.stream()
                 .map(CustomerDto::of)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * 고객 검색
-     */
-    @Transactional(readOnly = true)
-    public List<CustomerDto> searchCustomers(CustomerSearchDto searchDto) {
-        List<Customer> customers;
-
-        // 검색 조건이 없는 경우 전체 조회
-        if ((searchDto.getSearchQuery() == null || searchDto.getSearchQuery().trim().isEmpty()) &&
-                searchDto.getIsMember() == null) {
-            customers = customerRepository.findAll();
-        } else if (searchDto.getSearchBy() != null && !searchDto.getSearchBy().equals("all")) {
-            // 특정 필드 검색
-            customers = customerRepository.searchCustomersByField(
-                    searchDto.getSearchBy(),
-                    searchDto.getSearchQuery()
-            );
-
-            // 회원 여부 필터 추가
-            if (searchDto.getIsMember() != null) {
-                customers = customers.stream()
-                        .filter(customer -> customer.getIsMember().equals(searchDto.getIsMember()))
-                        .collect(Collectors.toList());
-            }
-        } else {
-            // 복합 검색
-            customers = customerRepository.searchCustomers(
-                    searchDto.getSearchQuery(),
-                    searchDto.getIsMember()
-            );
-        }
-
-        return customers.stream()
-                .map(CustomerDto::of)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 전화번호로 고객 찾기
-     */
-    @Transactional(readOnly = true)
-    public CustomerDto findByPhone(String phone) {
-        Customer customer = customerRepository.findByPhone(phone);
-        return customer != null ? CustomerDto.of(customer) : null;
-    }
-
-    /**
-     * 이메일로 고객 찾기
-     */
-    @Transactional(readOnly = true)
-    public CustomerDto findByEmail(String email) {
-        Customer customer = customerRepository.findByEmail(email);
-        return customer != null ? CustomerDto.of(customer) : null;
     }
 
     /**

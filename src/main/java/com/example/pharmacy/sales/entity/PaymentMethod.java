@@ -1,3 +1,4 @@
+// 양동현. 2025.06.18
 package com.example.pharmacy.sales.entity;
 
 public enum PaymentMethod {

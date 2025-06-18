@@ -1,4 +1,4 @@
-// 수정된 SaleController.java
+// 양동현. 2025.06.18
 package com.example.pharmacy.sales.controller;
 
 import com.example.pharmacy.medicine.dto.MedicineDto;

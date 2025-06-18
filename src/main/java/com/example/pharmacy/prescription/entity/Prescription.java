@@ -1,4 +1,4 @@
-// Prescription.java
+// 양동현. 2025.06.18
 package com.example.pharmacy.prescription.entity;
 
 import com.example.pharmacy.customer.entity.Customer;

@@ -1,4 +1,4 @@
-// SaleItem.java
+// 양동현. 2025.06.18
 package com.example.pharmacy.sales.entity;
 
 import com.example.pharmacy.inventory.entity.MedicineInventory;

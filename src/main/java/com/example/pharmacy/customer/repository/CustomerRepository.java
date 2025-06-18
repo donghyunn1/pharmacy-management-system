@@ -1,3 +1,4 @@
+// 양동현. 2025.06.18
 package com.example.pharmacy.customer.repository;
 
 import com.example.pharmacy.customer.entity.Customer;
@@ -8,9 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-
-    // 이름으로 고객 검색 (부분 일치)
-    List<Customer> findByNameContainingIgnoreCase(String name);
 
     // 전화번호로 고객 검색
     Customer findByPhone(String phone);

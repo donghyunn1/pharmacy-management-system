@@ -1,3 +1,4 @@
+// 양동현. 2025.06.18
 package com.example.pharmacy.customer.controller;
 
 import com.example.pharmacy.customer.dto.CustomerDto;
@@ -35,12 +36,8 @@ public class CustomerController {
     public String customerManagement(@ModelAttribute("customerSearchDto") CustomerSearchDto customerSearchDto, Model model) {
         List<CustomerDto> customers;
 
-        // 검색 조건이 있는 경우 검색, 없으면 전체 목록
-        if (hasSearchCondition(customerSearchDto)) {
-            customers = customerService.searchCustomers(customerSearchDto);
-        } else {
-            customers = customerService.getAllCustomers();
-        }
+
+        customers = customerService.getAllCustomers();
 
         model.addAttribute("customers", customers);
         model.addAttribute("customerSearchDto", customerSearchDto);
@@ -172,31 +169,5 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/customers";
-    }
-
-    /**
-     * AJAX - 전화번호로 고객 검색
-     */
-    @GetMapping("/search/phone")
-    @ResponseBody
-    public CustomerDto searchByPhone(@RequestParam("phone") String phone) {
-        return customerService.findByPhone(phone);
-    }
-
-    /**
-     * AJAX - 이메일로 고객 검색
-     */
-    @GetMapping("/search/email")
-    @ResponseBody
-    public CustomerDto searchByEmail(@RequestParam("email") String email) {
-        return customerService.findByEmail(email);
-    }
-
-    /**
-     * 검색 조건이 있는지 확인하는 헬퍼 메서드
-     */
-    private boolean hasSearchCondition(CustomerSearchDto searchDto) {
-        return (searchDto.getSearchQuery() != null && !searchDto.getSearchQuery().trim().isEmpty()) ||
-                searchDto.getIsMember() != null;
     }
 }

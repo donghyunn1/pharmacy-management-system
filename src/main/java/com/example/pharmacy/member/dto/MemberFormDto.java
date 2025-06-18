@@ -1,6 +1,6 @@
+// 양동현. 2025.06.18
 package com.example.pharmacy.member.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

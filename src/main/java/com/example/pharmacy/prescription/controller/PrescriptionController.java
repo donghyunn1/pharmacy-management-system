@@ -1,4 +1,4 @@
-// PrescriptionController.java
+// 양동현. 2025.06.18
 package com.example.pharmacy.prescription.controller;
 
 import com.example.pharmacy.customer.dto.CustomerDto;
@@ -131,25 +131,5 @@ public class PrescriptionController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/prescriptions";
-    }
-
-    /**
-     * AJAX - 처방전 유효성 검증
-     */
-    @GetMapping("/{prescriptionId}/validate")
-    @ResponseBody
-    public boolean validatePrescription(@PathVariable("prescriptionId") Long prescriptionId,
-                                        @RequestParam("medicineId") Long medicineId,
-                                        @RequestParam("quantity") int quantity) {
-        return prescriptionService.validatePrescription(prescriptionId, medicineId, quantity);
-    }
-
-    /**
-     * AJAX - 유효한 처방전 목록 조회
-     */
-    @GetMapping("/valid")
-    @ResponseBody
-    public List<PrescriptionDto> getValidPrescriptions() {
-        return prescriptionService.getValidPrescriptions();
     }
 }

@@ -1,4 +1,4 @@
-// PrescriptionService.java
+// 양동현. 2025.06.18
 package com.example.pharmacy.prescription.service;
 
 import com.example.pharmacy.customer.entity.Customer;
@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
